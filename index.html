@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tactical Mesh Terminal</title>
+
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"/>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="chat-app">
+
+    <header class="chat-header">
+        <div class="node-info">
+            <div class="status-dot" id="statusDot"></div>
+            <div>
+                <h3 id="nodeTitle">Tactical Radio Node</h3>
+                <span id="statusText">Disconnected</span>
+            </div>
+        </div>
+        <button id="connectBtn" onclick="connectBluetooth()">Connect</button>
+    </header>
+
+    <div class="node-id-banner" id="nodeIdBanner" style="display:none;">
+        <span class="node-id-label">YOUR NODE ID</span>
+        <span class="node-id-value" id="nodeIdValue">----</span>
+    </div>
+
+    <!-- ── Map panel ── -->
+    <div class="map-panel">
+        <div id="map"></div>
+        <div class="map-overlay-legend" id="mapLegend">
+            <span class="legend-dot self"></span><span>You</span>
+            <span class="legend-dot peer"></span><span>Node</span>
+            <span class="legend-dot stale"></span><span>Stale</span>
+        </div>
+        <div class="map-node-count" id="mapNodeCount">0 nodes</div>
+    </div>
+
+    <main class="chat-window" id="chatWindow">
+        <div class="system-message">
+            <span>--- System Offline. Click Connect to Scan ---</span>
+        </div>
+    </main>
+
+    <footer class="chat-input-area">
+        <input type="text" id="targetId" placeholder="Target" maxlength="4" disabled>
+        <div class="input-wrapper">
+            <input type="text" id="messageInput" placeholder="Type a message..." disabled>
+        </div>
+        <button id="sendBtn" onclick="sendMessage()" disabled>
+            <svg viewBox="0 0 24 24" width="24" height="24">
+                <path fill="currentColor" d="M2,21L23,12L2,3V10L17,12L2,14V21Z" />
+            </svg>
+        </button>
+    </footer>
+</div>
+
+<!-- Leaflet JS -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
