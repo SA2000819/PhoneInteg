@@ -7,6 +7,22 @@ let rxCharacteristic = null;
 let bluetoothDevice  = null;
 let selfNodeId        = null;
 
+// ─── Write queue — prevents concurrent BLE writes dropping silently ───────────
+let writeQueue = Promise.resolve();
+
+function bleWrite(text) {
+    writeQueue = writeQueue.then(async () => {
+        try {
+            await rxCharacteristic.writeValueWithoutResponse(
+                encoder.encode(text)
+            );
+        } catch(e) {
+            console.error("BLE write failed:", e);
+        }
+    });
+    return writeQueue;
+}
+
 const chatWindow   = document.getElementById('chatWindow');
 const targetInput  = document.getElementById('targetId');
 const messageInput = document.getElementById('messageInput');
@@ -189,9 +205,7 @@ function onGPSError(err) {
 
 async function sendGPSBeacon(lat, lon) {
     try {
-        await rxCharacteristic.writeValueWithoutResponse(
-            encoder.encode(`GPSPOS:${lat.toFixed(6)},${lon.toFixed(6)}`)
-        );
+        await bleWrite(`GPSPOS:${lat.toFixed(6)},${lon.toFixed(6)}`);
     } catch(e) {
         console.error("GPS beacon send failed:", e);
     }
@@ -255,8 +269,7 @@ async function connectBluetooth() {
         insertAlert('SYSTEM: Secure Radio Link Established.');
 
         // Send PING immediately — the firmware replies the moment it receives the write.
-        await rxCharacteristic.writeValueWithoutResponse(encoder.encode('PING'));
-
+        await bleWrite('PING');
         // Start phone GPS shortly after — gives the PING response time to set selfNodeId
         setTimeout(startPhoneGPS, 1000);
 
@@ -322,9 +335,7 @@ async function sendMessage() {
 
     if (target.length === 4 && message.length > 0) {
         try {
-            await rxCharacteristic.writeValueWithoutResponse(
-                encoder.encode(`${target}:${message}`)
-            );
+            await bleWrite(`${target}:${message}`);
             insertBubble('sent', 'You', message);
             messageInput.value = '';
         } catch (err) {
